@@ -26,7 +26,8 @@ const penjualanSchema = new Schema({
     marketing_Id: { type: String, require: true },
     cargo_fee: { type: Number, require: true, defaultValue: 0 },
     total_balance: { type: Number, require: true },
-    grand_total: { type: Number, require: true, defaultValue: 0 }
+    grand_total: { type: Number, require: true, defaultValue: 0 },
+    tanggal_penjualan: { type: String, require: true }
 }, { timestamps: { createdAt: 'date', updatedAt: false }, collection: 'penjualan' })
 
 // Skema Field Pembayaran
@@ -37,7 +38,8 @@ const pembayaranSchema = new Schema({
     jenis_pembayaran: { type: String, require: true },
     nominal: { type: Number, require: true },
     status: { type: String, require: true },
-    jangka_waktu: { type: String }
+    jangka_waktu: { type: String },
+    tanggal_pembayaran: { type: String, require: true }
 }, { timestamps: { createdAt: 'date' }, collection: 'pembayaran' })
 
 // Skema Field Perhitungan

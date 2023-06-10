@@ -1,6 +1,9 @@
 ### Get All Marketing
 GET http://localhost:8000/getAllMarketing
 
+### Get All User
+GET http://localhost:8000/getAllUser
+
 ### Get All Penjualan
 GET http://localhost:8000/getAllPenjualan
 
@@ -11,27 +14,27 @@ GET http://localhost:8000/getAllPembayaran
 GET http://localhost:8000/getAllPerhitungan
 
 ### Get Marketing Handler
-GET http://localhost:8000/getMarketing?name=
+GET http://localhost:8000/getMarketing?name=Alfandy
 
 ### Get User Handler
-GET http://localhost:8000/getUser?email=
+GET http://localhost:8000/getUser?email=nami@gmail.com
 
 ### Get Pembayaran Handler
-GET http://localhost:8000/getPembayaran?transaction_number=
+GET http://localhost:8000/getPembayaran?transaction_number=TRX005
 
 ### Create Marketing Handler
 POST http://localhost:8000/createMarketing
 Content-Type: application/json
 
-{ "name": "Marketing" }
+{ "name": "Alfandy" }
 
 ### Create User Handler
 POST http://localhost:8000/createUser
 Content-Type: application/json
 
 {
-    "name": "Cehwin",
-    "email": "cehwin@gmail.com",
+    "name": "nami",
+    "email": "nami@gmail.com",
     "password": "101010",
     "rekening": [
         {
@@ -54,9 +57,10 @@ POST http://localhost:8000/createPenjualan
 Content-Type: application/json
 
 {
-    "transaction_number": "TX001",
-    "marketing_Id": "6484083dd6149e476103356d",
-    "total_balance": 600000
+    "transaction_number": "TX006",
+    "marketing_Id": "648467e7a14d31f7a6427e8f",
+    "total_balance": 100000000,
+    "tanggal_penjualan": "12/5/2023"
 }
 
 ### Create Pembayaran Handler Dengan Cara Kontan
@@ -64,10 +68,10 @@ POST http://localhost:8000/createPembayaran
 Content-Type: application/json
 
 {
-    "email": "cehwin@gmail.com",
+    "email": "nami@gmail.com",
     "password": "101010",
-    "transaction_number": "TX001",
-    "metode_pembayaran": "bca",
+    "transaction_number": "TX006",
+    "metode_pembayaran": "ovo",
     "jenis_pembayaran": "kontan"
 }
 
@@ -76,13 +80,16 @@ POST http://localhost:8000/createPembayaran
 Content-Type: application/json
 
 {
-    "email": "cehwin@gmail.com",
+    "email": "nami@gmail.com",
     "password": "101010",
-    "transaction_number": "TX001",
+    "transaction_number": "TX005",
     "metode_pembayaran": "ovo",
     "jenis_pembayaran": "kredit",
     "jangka_waktu": "3 bulan"
 }
 
 ### Bayar Tagihan Kredit Pembayaran
-GET http://localhost:8000/bayarKredit?transaction_number=&user_id=
+GET http://localhost:8000/bayarKredit?transaction_number=TRX005&user_id=64847b2cb1d753a274aca940
+
+### Contoh demonstrasi API via PostMan
+https://documenter.getpostman.com/view/21638885/2s93sc4sN4#ae7f6683-b9c8-4607-9e84-4ce9dd255e84

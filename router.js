@@ -11,6 +11,7 @@ class Routes{
     // Fungsi atau Method yang memanggil Route GET
     getRoutes(){
        this.router.get('/getAllMarketing', Service.getAllMarketing)
+       this.router.get('/getAllUser', Service.getAllUser)
        this.router.get('/getAllPenjualan', Service.getAllPenjualan)
        this.router.get('/getAllPembayaran', Service.getAllPembayaran)
        this.router.get('/getAllPerhitungan', Service.getAllPerhitungan)

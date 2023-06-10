@@ -2,11 +2,12 @@ import { Marketing, Penjualan, User, Pembayaran, Perhitungan } from './db/schema
 import bcrypt from 'bcrypt'
 
 // Fungsi Membuat atau Update Perhitungan Marketing sesuai bulan dibuatnya Penjualan
-async function createPerhitungan(marketingId, omzet){
+async function createPerhitungan(marketingId, omzet, tanggalPembayaran){
     try{
         const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+        const getBulan = bulan[parseInt(tanggalPembayaran.split('/')[1])-1]
         const marketing = await Marketing.findOne({ _id: marketingId })
-        let perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()] })
+        let perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: getBulan })
         let komisi
         let komisiNominal
         if(!perhitungan){
@@ -18,11 +19,11 @@ async function createPerhitungan(marketingId, omzet){
             komisiNominal = (omzet * komisi)/100
             await Perhitungan.create({
                 marketing: marketing.name,
-                bulan: bulan[new Date().getMonth()],
+                bulan: getBulan,
                 omzet, komisi: `${komisi}%`, komisiNominal
             })
-            perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()] })
-            return { msg: `Berhasil membuat perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()]}`, perhitungan}
+            perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: getBulan })
+            return { msg: `Berhasil membuat perhitungan ${marketing.name} pada bulan ${getBulan}`, perhitungan}
         } else {
             // Kondisi saat Marketing sudah memiliki data Perhitungan pada bulan Penjualan dibuat
             perhitungan.omzet += omzet
@@ -34,7 +35,7 @@ async function createPerhitungan(marketingId, omzet){
             perhitungan.komisi = `${komisi}%`
             perhitungan.komisiNominal = komisiNominal
             await perhitungan.save()
-            return { msg: `Berhasil memperbarui perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()]}`, perhitungan }
+            return { msg: `Berhasil memperbarui perhitungan ${marketing.name} pada bulan ${getBulan}`, perhitungan }
         }
     }catch(err){ return { err: err.message } }
 }
@@ -48,6 +49,15 @@ class Service{
             const marketing = await Marketing.find()
             if(!marketing) return res.status(400).json({ msg: "Belum ada marketing ditambahkan!" })
             return res.status(200).json(marketing)
+        }catch(err){ res.status(400).json({ msg: err.message }) }
+    }
+
+      // Fungsi Untuk Mengambil Semua Data Marketing
+      async getAllUser(req, res){
+        try{
+            const users = await User.find()
+            if(!users) return res.status(400).json({ msg: "Belum ada user ditambahkan!" })
+            return res.status(200).json(users)
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
@@ -145,7 +155,8 @@ class Service{
             const verify = await bcrypt.compare(req.body.password, user.password)
             !verify ? res.status(400).json({ msg: 'Verifikasi password salah!' }) : true
             const pembayaran = new Pembayaran(req.body)
-            pembayaran.user_id = user._id     
+            pembayaran.user_id = user._id
+            pembayaran.tanggal_pembayaran = pesanan.tanggal_penjualan    
 
             if(pembayaran.jenis_pembayaran == "kredit" && (req.body.jangka_waktu && req.body.jangka_waktu !== "1 bulan")){
                 // Jika Pembayaran dilakukan secara Kredit
@@ -165,7 +176,7 @@ class Service{
             await pembayaran.save()
 
             // Setelah proses Pembayaran, membuat Perhitungan Marketing dari Penjualan
-            const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, pembayaran.nominal) || "kosong"
+            const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, pembayaran.nominal, pembayaran.tanggal_pembayaran) || "kosong"
 
             // End Point berupa pesan Pembayaran sukses dan sisa saldo bank pengguna
             return res.status(200).json({ 
@@ -204,7 +215,7 @@ class Service{
             await pembayaran.save()
 
             // Membuat Perhitungan Marketing untuk tagihan yang telah dibayarkan
-            const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, sisaBayar) || "kosong"
+            const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, sisaBayar, req.query.tanggal_pembayaran) || "kosong"
 
             // End Point berupa pesan Pembayaran berhasil dan sisa saldo bank pengguna
             res.status(200).json({ 
