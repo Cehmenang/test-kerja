@@ -1,13 +1,14 @@
 import express from 'express'
 import Service from './service.js'
-import Pagination from './pagination.js'
 
+// Class Router yang berisi Routingan Web
 class Routes{
     constructor(){
         this.router = express.Router()
         this.getRoutes()
         this.postRoutes()
     }
+    // Fungsi atau Method yang memanggil Route GET
     getRoutes(){
        this.router.get('/getAllMarketing', Service.getAllMarketing)
        this.router.get('/getAllPenjualan', Service.getAllPenjualan)
@@ -15,8 +16,10 @@ class Routes{
        this.router.get('/getAllPerhitungan', Service.getAllPerhitungan)
        this.router.get('/getMarketing', Service.getMarketing)
        this.router.get('/getUser', Service.getUser)
+       this.router.get('/getPembayaran', Service.getPembayaran)
        this.router.get('/bayarKredit', Service.bayarKredit)
     }
+    // Fungsi atau Method yang memanggil Route POST
     postRoutes(){
         this.router.post('/createUser', Service.createUser)
         this.router.post('/createMarketing', Service.createMarketing)

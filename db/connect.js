@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 const mongoURI = "mongodb+srv://Cehmenang:FnvS4YAPF8vRT1dT@cehmenang.0fs07tp.mongodb.net/Dummy?retryWrites=true&w=majority"
 
+// Fungsi untuk memanggil koneksi Database
 export default async function(){
     try{
         await mongoose.set('strictQuery', false)

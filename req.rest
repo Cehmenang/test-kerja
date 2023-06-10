@@ -1,0 +1,88 @@
+### Get All Marketing
+GET http://localhost:8000/getAllMarketing
+
+### Get All Penjualan
+GET http://localhost:8000/getAllPenjualan
+
+### Get All Pembayaran
+GET http://localhost:8000/getAllPembayaran
+
+### Get All Perhitungan
+GET http://localhost:8000/getAllPerhitungan
+
+### Get Marketing Handler
+GET http://localhost:8000/getMarketing?name=
+
+### Get User Handler
+GET http://localhost:8000/getUser?email=
+
+### Get Pembayaran Handler
+GET http://localhost:8000/getPembayaran?transaction_number=
+
+### Create Marketing Handler
+POST http://localhost:8000/createMarketing
+Content-Type: application/json
+
+{ "name": "Marketing" }
+
+### Create User Handler
+POST http://localhost:8000/createUser
+Content-Type: application/json
+
+{
+    "name": "Cehwin",
+    "email": "cehwin@gmail.com",
+    "password": "101010",
+    "rekening": [
+        {
+            "bank": "ovo",
+            "saldo": 12000000
+        },
+        {
+            "bank": "bri",
+            "saldo": 24000000
+        },
+        {
+            "bank": "bca",
+            "saldo": 3600000
+        }
+    ]
+}
+
+### Create Penjualan Handler
+POST http://localhost:8000/createPenjualan
+Content-Type: application/json
+
+{
+    "transaction_number": "TX001",
+    "marketing_Id": "6484083dd6149e476103356d",
+    "total_balance": 600000
+}
+
+### Create Pembayaran Handler Dengan Cara Kontan
+POST http://localhost:8000/createPembayaran
+Content-Type: application/json
+
+{
+    "email": "cehwin@gmail.com",
+    "password": "101010",
+    "transaction_number": "TX001",
+    "metode_pembayaran": "bca",
+    "jenis_pembayaran": "kontan"
+}
+
+### Create Pembayaran Handler Dengan Cara Kredit
+POST http://localhost:8000/createPembayaran
+Content-Type: application/json
+
+{
+    "email": "cehwin@gmail.com",
+    "password": "101010",
+    "transaction_number": "TX001",
+    "metode_pembayaran": "ovo",
+    "jenis_pembayaran": "kredit",
+    "jangka_waktu": "3 bulan"
+}
+
+### Bayar Tagihan Kredit Pembayaran
+GET http://localhost:8000/bayarKredit?transaction_number=&user_id=

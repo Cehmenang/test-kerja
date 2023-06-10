@@ -1,11 +1,12 @@
 import { Marketing, Penjualan, User, Pembayaran, Perhitungan } from './db/schema.js'
 import bcrypt from 'bcrypt'
 
+// Fungsi Membuat atau Update Perhitungan Marketing sesuai bulan dibuatnya Penjualan
 async function createPerhitungan(marketingId, omzet){
     try{
         const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
         const marketing = await Marketing.findOne({ _id: marketingId })
-        let perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth() + 1] })
+        let perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()] })
         let komisi
         let komisiNominal
         if(!perhitungan){
@@ -16,11 +17,11 @@ async function createPerhitungan(marketingId, omzet){
             komisiNominal = (omzet * komisi)/100
             await Perhitungan.create({
                 marketing: marketing.name,
-                bulan: bulan[new Date().getMonth()+1],
+                bulan: bulan[new Date().getMonth()],
                 omzet, komisi: `${komisi}%`, komisiNominal
             })
-            perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()+1] })
-            return { msg: `Berhasil membuat perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()+1]}`, perhitungan}
+            perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()] })
+            return { msg: `Berhasil membuat perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()]}`, perhitungan}
         } else {
             perhitungan.omzet += omzet
             if(omzet < 100000000) komisi = 0
@@ -31,13 +32,15 @@ async function createPerhitungan(marketingId, omzet){
             perhitungan.komisi = `${komisi}%`
             perhitungan.komisiNominal = komisiNominal
             await perhitungan.save()
-            return { msg: `Berhasil memperbarui perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()+1]}`, perhitungan }
+            return { msg: `Berhasil memperbarui perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()]}`, perhitungan }
         }
     }catch(err){ return { err: err.message } }
 }
 
+// Class Yang Memuat Berbagai Fungsi atau Method Service
 class Service{
 
+    // Fungsi Untuk Mengambil Semua Data Marketing
     async getAllMarketing(req, res){
         try{
             const marketing = await Marketing.find()
@@ -46,6 +49,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Semua Data Penjualan
     async getAllPenjualan(req, res){
         try{
             const penjualan = await Penjualan.find()
@@ -54,6 +58,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Semua Data Pembayaran
     async getAllPembayaran(req, res){
         try{
             const pembayaran = await Pembayaran.find()
@@ -62,6 +67,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Semua Data Perhitungan
     async getAllPerhitungan(req, res){
         try{
             const perhitungan = await Perhitungan.find()
@@ -70,6 +76,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Data Marketing Yang Dicari
     async getMarketing(req, res){
         try{
             const marketing = await Marketing.findOne({name: req.query.name})
@@ -78,6 +85,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Data User Yang Dicari
     async getUser(req, res){
         try{
             const user = await User.findOne({ email: req.query.email })
@@ -86,6 +94,16 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Mengambil Data Pembayaran Yang Dicari
+    async getPembayaran(req, res){
+        try{
+            const pembayaran = await Pembayaran.findOne({ transaction_number: req.query.transaction_number })
+            if(!pembayaran) return res.status(400).json({ msg: "Pembayaran tidak ditemukan!" })
+            return res.status(200).json(pembayaran)
+        }catch(err){ res.status(400).json({ msg: err.message }) }
+    }
+
+    // Fungsi Untuk Membuat Akun User
     async createUser(req, res){
         try{
             const user = new User(req.body)
@@ -96,6 +114,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Membuat Akun Marketing
     async createMarketing(req, res){
         try{
             await Marketing.create(req.body)
@@ -103,6 +122,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Membuat Penjualan
     async createPenjualan(req, res){
         try{    
             const penjualan = new Penjualan(req.body)
@@ -113,6 +133,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Membuat Pembayaran
     async createPembayaran(req, res){
         try{
             const pesanan = await Penjualan.findOne({ transaction_number: req.body.transaction_number })
@@ -142,6 +163,7 @@ class Service{
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
+    // Fungsi Untuk Membayar Tagihan Kredit Pembayaran
     async bayarKredit(req, res){
         try{
             const user = await User.findOne({ _id: req.query.user_id })
@@ -159,8 +181,8 @@ class Service{
             await pembayaran.save()
             const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, sisaBayar) || "kosong"
             res.status(200).json({ 
-                msg: `Tagihan berhasil dibayar. Sisa saldo: ${user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo}` 
-            }, pembayaran, perhitunganMsg)
+                msg: `Tagihan berhasil dibayar. Sisa saldo: ${user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo}`, 
+            pembayaran, perhitunganMsg})
         }catch(err){ res.status(400).json({ msg: err.message }) }
     }
 
