@@ -3,6 +3,7 @@ import Routes from './router.js'
 import connect from './db/connect.js'
 import layout from 'express-ejs-layouts'
 import dotenv from 'dotenv'
+import cors from 'cors'
 dotenv.config()
 
 class App{
@@ -13,9 +14,11 @@ class App{
         this.connection()
     }
     middleware(){
-        // this.app.set('view engine', 'ejs')
-        // this.app.use(layout())
+        this.app.set('view engine', 'ejs')
+        this.app.use(layout)
+        this.app.use(cors({ origin: '*', credentials: true }))
         this.app.use(express.json())
+        this.app.use(express.static('style'))
         this.app.use(express.urlencoded({ extended: true }))
         this.app.use(Routes)
     }

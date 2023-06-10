@@ -1,0 +1,40 @@
+<h1>Buat Penjualan</h1>
+<form method="post">
+    <div class="outer-input">
+        <div class="sub-input">
+            <h3>No. Transaksi</h3>
+            <input type="text" name="transaction_number" placeholder="Nomor Transaksi">
+        </div>
+        <div class="sub-input">
+            <h3>Marketing</h3>
+             <select name="marketing_id">
+                <% marketings.forEach(marketing => { %>
+                    <option value="<%= marketing._id %>"><%= marketing.name %></option>
+                <% }) %>
+            </select>
+        </div>
+    </div>
+
+    <div class="outer-input">
+        <div class="sub-input">
+            <h3>Date</h3>
+            <input type="date" name="date">
+        </div>
+        <div class="sub-input">
+            <h3>Cargo Fee</h3>
+            <input type="text" name="cargo_fee" placeholder="0">
+        </div>
+    </div>
+
+    <div class="outer-input">
+        <div class="sub-input">
+            <h3>Total Balance</h3>
+            <input type="text" name="total_balance" placeholder="0">
+        </div>
+        <div class="sub-input">
+            <h3>Grand Total</h3>
+            <input type="text" name="grand_total" placeholder="0">
+        </div>
+    </div>
+    <button type="submit">Kirim</button>
+</form>

@@ -1,5 +1,6 @@
 import express from 'express'
-import Controller from './controller.js'
+import Service from './service.js'
+import Pagination from './pagination.js'
 
 class Routes{
     constructor(){
@@ -8,10 +9,19 @@ class Routes{
         this.postRoutes()
     }
     getRoutes(){
-        this.router.get('/test', (req, res)=>res.json({ test: 'test response!' }))
+       this.router.get('/getAllMarketing', Service.getAllMarketing)
+       this.router.get('/getAllPenjualan', Service.getAllPenjualan)
+       this.router.get('/getAllPembayaran', Service.getAllPembayaran)
+       this.router.get('/getAllPerhitungan', Service.getAllPerhitungan)
+       this.router.get('/getMarketing', Service.getMarketing)
+       this.router.get('/getUser', Service.getUser)
+       this.router.get('/bayarKredit', Service.bayarKredit)
     }
     postRoutes(){
-        this.router.post('/createMarketing', Controller.createMarketing)
+        this.router.post('/createUser', Service.createUser)
+        this.router.post('/createMarketing', Service.createMarketing)
+        this.router.post('/createPenjualan', Service.createPenjualan)
+        this.router.post('/createPembayaran', Service.createPembayaran)
     }
 }
 
