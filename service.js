@@ -10,6 +10,7 @@ async function createPerhitungan(marketingId, omzet){
         let komisi
         let komisiNominal
         if(!perhitungan){
+            // Kondisi jika Marketing belum memiliki data Perhitungan pada bulan Penjualan dibuat
             if(omzet < 100000000) komisi = 0
             if(omzet >= 100000000 && omzet < 200000000) komisi = 2.5
             if(omzet >= 200000000 && omzet < 500000000) komisi = 5
@@ -23,6 +24,7 @@ async function createPerhitungan(marketingId, omzet){
             perhitungan = await Perhitungan.findOne({ marketing: marketing.name, bulan: bulan[new Date().getMonth()] })
             return { msg: `Berhasil membuat perhitungan ${marketing.name} pada bulan ${bulan[new Date().getMonth()]}`, perhitungan}
         } else {
+            // Kondisi saat Marketing sudah memiliki data Perhitungan pada bulan Penjualan dibuat
             perhitungan.omzet += omzet
             if(omzet < 100000000) komisi = 0
             if(omzet >= 100000000 && omzet < 200000000) komisi = 2.5
@@ -138,23 +140,34 @@ class Service{
         try{
             const pesanan = await Penjualan.findOne({ transaction_number: req.body.transaction_number })
             const user = await User.findOne({ email: req.body.email })
+
+            // Verifikasi Akun Sebelum Melakukan Pembayaran
             const verify = await bcrypt.compare(req.body.password, user.password)
             !verify ? res.status(400).json({ msg: 'Verifikasi password salah!' }) : true
             const pembayaran = new Pembayaran(req.body)
-            pembayaran.user_id = user._id      
+            pembayaran.user_id = user._id     
+
             if(pembayaran.jenis_pembayaran == "kredit" && (req.body.jangka_waktu && req.body.jangka_waktu !== "1 bulan")){
+                // Jika Pembayaran dilakukan secara Kredit
                 pembayaran.jangka_waktu = req.body.jangka_waktu
                 const kredit = parseInt(pembayaran.jangka_waktu.split(' ')[0])
                 pembayaran.nominal = Math.round(pesanan.grand_total / kredit)
                 pembayaran.status = `Sisa ${kredit - 1} bulan`
             } else { 
+                // Jika Pembayaran dilakukan secara Kontan
                 pembayaran.nominal = pesanan.grand_total
                 pembayaran.status = "lunas"
             }
             user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo -= pembayaran.nominal
+
+            // Pembayaran selesai dan save data yang sudah diolah pada proses Pembayaran
             await user.save()
             await pembayaran.save()
+
+            // Setelah proses Pembayaran, membuat Perhitungan Marketing dari Penjualan
             const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, pembayaran.nominal) || "kosong"
+
+            // End Point berupa pesan Pembayaran sukses dan sisa saldo bank pengguna
             return res.status(200).json({ 
                 msg: pembayaran.jenis_pembayaran == "kredit" ? `Pembayaran berhasil!, tagihan ${pembayaran.status}.` : 'Pembayaran berhasil!',
                 saldo: `Sisa saldo ${pembayaran.metode_pembayaran}: ${user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo}.`,
@@ -168,18 +181,32 @@ class Service{
         try{
             const user = await User.findOne({ _id: req.query.user_id })
             const pembayaran = await Pembayaran.findOne({ transaction_number: req.query.transaction_number, user_id: req.query.user_id })
+
+            // Melakukan pengecekan kepada Pembayaran, apakah sudah lunas atau belum
             if(pembayaran.status == "lunas") return res.status(200).json({ msg: 'Pembayaran sudah lunas!' })
+
+            // Logika proses Pembayaran tagihan kredit sesuai jangka waktu kredit
             const pesanan = await Penjualan.findOne({ transaction_number: req.query.transaction_number })
             const kredit = parseInt(pembayaran.status.split(' ')[1])
             const sisaBayar = Math.round((pesanan.grand_total - pembayaran.nominal) / kredit)
             pembayaran.nominal += sisaBayar
             user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo -= sisaBayar
+
+            // Kondisi apabila saldo bank yang ditentukan tidak mencukupi untuk melakukan pembayaran
             if(user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo < 0) return res.status(400).json({ msg: `Maaf, saldo anda tidak cukup untuk melakukan pembayaran!` })
+
+            // Memperbarui status pembayaran
             if(kredit == 1) pembayaran.status = `lunas`
             else pembayaran.status = `Sisa ${kredit - 1} bulan`
+
+            // Proses Pembayaran Kredit telah selesai, dan data akan diperbarui dengan save
             await user.save()
             await pembayaran.save()
+
+            // Membuat Perhitungan Marketing untuk tagihan yang telah dibayarkan
             const perhitunganMsg = await createPerhitungan(pesanan.marketing_Id, sisaBayar) || "kosong"
+
+            // End Point berupa pesan Pembayaran berhasil dan sisa saldo bank pengguna
             res.status(200).json({ 
                 msg: `Tagihan berhasil dibayar. Sisa saldo: ${user.rekening.filter(rek=>rek.bank == pembayaran.metode_pembayaran)[0].saldo}`, 
             pembayaran, perhitunganMsg})
