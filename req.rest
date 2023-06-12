@@ -89,7 +89,7 @@ Content-Type: application/json
 }
 
 ### Bayar Tagihan Kredit Pembayaran
-GET http://localhost:8000/bayarKredit?transaction_number=TRX005&user_id=64847b2cb1d753a274aca940
+GET http://localhost:8000/bayarKredit?transaction_number=TRX005&user_id=64847b2cb1d753a274aca940&tanggal_pembayaran=12/8/2023
 
 ### Contoh demonstrasi API via PostMan
 https://documenter.getpostman.com/view/21638885/2s93sc4sN4#ae7f6683-b9c8-4607-9e84-4ce9dd255e84

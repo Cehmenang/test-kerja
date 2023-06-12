@@ -1,0 +1,94 @@
+#INTRUKSI SETUP PROGRAM
+
+yang perlu disiapkan:
+# NodeJS LTS, GIT, CMD / GitBash, VS Code
+
+1. Clone Repository Program kedalam PC anda.
+
+2. Buka repo program yang sudah di clone, lalu buka VS Code.
+
+3. Masuk ke menu File pada VS Code, lalu klik open folder, dan buka repo program kedalam VS Code.
+
+4. Jika sudah, buka tab terminal di VS Code dengan cara CTRL + SHIFT + ` atau ke menu Terminal -> New Terminal.
+
+5. Pada terminal, pastikan direktori terakhir berada pada repo program, yaitu 'test-kerja'. Jika direktori terakhir belum sampai di 'test-kerja', anda bisa turun direktori dengan mengetikkan 'cd nama_direktori' pada terminal lalu enter, sampai direktori terakhir berada pada 'test-kerja'. Jika 'test-kerja' berada diatas direktori terakhir, maka kita bisa mengetikkan 'cd ..' pada terminal sampai 'test-kerja' jadi direktori terakhir.
+
+6. Jika sudah set direktori, sekarang anda bisa mengetikkan 'npm i' pada terminal, lalu enter untuk menginstall semua dependensi yang ada pada program.
+
+7. Untuk melakukan test pada API, kita butuh ekstensi tambahan pada VS Code yang bernama 'Rest Client'. Cara unduh ekstensi adalah masuk ke tab extension dengan cara 'CTRL + SHIFT + X '. Pada bagian 'Search Extensions' ketik 'Rest Client' lalu install. Nantinya testing API dilakukan pada file 'req.rest' yang sudah saya siapkan di repo program.
+
+8. Setelah selesai install dependensi, kita bisa mulai menjalankan server dengan mengetikkan "npm run dev" pada terminal, lalu enter dan tunggu sampai muncul info 'Menjalankan Server dan Database pada localhost' pada terminal, selain info diatas maka yang tampil adalah pesan error atau sebagainya.
+
+9. Untuk mematikan server cukup tekan 'CTRL + C' pada terminal, otomatis server akan terputus.
+
+#INTRUKSI STRUKTUR FOLDER / REPO
+1. Folder DB :
+    a) connect.js => file yang memuat fungsi koneksi database
+    b) schema.js => file yang memuat skema dokumen dan model dokumen database yang akan digunakan
+2. .env => file yang berisi data konfigurasi penting seperti SECRET atau TOKEN
+3. app.js => file base aplikasi
+4. package-lock.json & package.json => berisi konfigurasi npm dan dependensi
+5. req.rest => file untuk testing API (testing tool API)
+6. router.js => file yang berisi routing yang ada pada aplikasi
+6. service.js => file yang berisi fungsi logika program dari tiap routing yang ada
+7. node_modules => folder bawaan npm
+
+#INTRUKSI ALUR TESTING API DENGAN REST CLIENT PADA FILE REQ.REST
+Note: Untuk melihat contoh atau demonstrasi API, anda bisa klik link berikut:
+https://documenter.getpostman.com/view/21638885/2s93sc4sN4#ae7f6683-b9c8-4607-9e84-4ce9dd255e84
+
+1. Buka file 'req.rest' pada VS Code. Sebelum menjalankan API, pastikan server sedang berjalan.
+
+2. Total ada 14 fungsi yang tersedia. Proses kerja API dimulai dari membuat akun User pada http://localhost:8000/createUser dengan memasukkan data berupa nama, email, password, dan rekening bank, Lalu klik 'Send Request' untuk membuat data User. Nanti akan muncul response pesan berhasil.
+
+3. Setelah membuat akun User, lanjut untuk membuat akun Marketing pada http://localhost:8000/createMarketing dengan memasukkan data berupa nama Marketing, 'Send Request' untuk membuat data Marketing. Nanti akan muncul response pesan berhasil.
+
+4. Setelah membuat akun Marketing dan User, lanjut untuk membuat Penjualan  pada http://localhost:8000/createPenjualan dengan memasukkan data berupa:
+
+a. transaction_number (no transaksi di input secara manual), 
+b. marketing_Id (id marketing dapat didapatkan pada http://localhost:8000/getMarketing dengan cara memasukkan nama marketing yang dituju pada parameter 'name' (besar kecilnya nama diperhatikan), lalu klik 'Send Request', maka akan muncul response informasi data marketing dan anda tinggal copy id marketingnya dan paste ke kolom data marketing_Id),
+c. total_balance,
+d. tanggal_penjualan.
+    
+Setelah memasukkan data, klik 'Send Request' untuk membuat data Penjualan. Nanti akan muncul response pesan berhasil dan data Penjualan.
+
+5. DISINI JENIS PEMBAYARAN AKAN DIBAGI MENJADI 2, YAITU KONDISI PEMBAYARAN KONTAN DAN KREDIT
+
+### JENIS PEMBAYARAN KONTAN
+
+5.1 Setelah membuat data Penjualan, lanjut untuk membuat Pembayaran dari Penjualan sebelumnya pada http://localhost:8000/createPembayaran dengan memasukkan data berupa:
+
+a. email (pilih dan masukkan email User yang telah dibuat untuk melakukan Pembayaran),
+b. password (masukkan password User yang telah diinputkan),
+c. transaction_number (no transaksi di input secara manual sesuai no transaksi Penjualan yang telah dibuat), 
+d. metode_pembayaran (pilih metode pembayaran sesuai dengan rekening bank yang User punya),
+e. jenis_pembayaran (isi jenis_pembayaran dengan pembayaran 'kontan').
+
+Setelah memasukkan data, klik 'Send Request' untuk membuat data Pembayaran. Nanti akan muncul response pesan berhasil dan data Pembayaran, sisa saldo rekening User, dan Perhitungan dari Marketing yang memegang Penjualan tersebut.
+
+### JENIS PEMBAYARAN KREDIT
+
+5.2 Setelah membuat data Penjualan, lanjut untuk membuat Pembayaran dari Penjualan sebelumnya pada http://localhost:8000/createPembayaran dengan memasukkan data berupa:
+
+a. email (pilih dan masukkan email User yang telah dibuat untuk melakukan Pembayaran),
+b. password (masukkan password User yang telah diinputkan),
+c. transaction_number (no transaksi di input secara manual sesuai no transaksi Penjualan yang telah dibuat), 
+d. metode_pembayaran (pilih metode pembayaran sesuai dengan rekening bank yang User punya),
+e. jenis_pembayaran (isi jenis_pembayaran dengan pembayaran 'kredit'),
+f. jangka_waktu (isi jangka waktu dengan format 'angka' spasi 'bulan' contoh: '6 bulan'. Jangka waktu kredit bisa diisi berapapun sesuai kehendak User mau kredit berapa bulan).
+
+Setelah memasukkan data, klik 'Send Request' untuk membuat data Pembayaran. Jika Pembayaran sukses, secara otomatis membuat data Perhitungan juga dari Marketing yang memegang Penjualan tersebut. Nanti akan muncul response pesan berhasil dan data Pembayaran, sisa saldo rekening User, dan Perhitungan Marketing.
+
+### KONDISI BAYAR TAGIHAN KREDIT PEMBAYARAN
+
+6. Jika anda memilih jenis_pembayaran 'kredit', maka untuk melakukan Pembayaran kredit pada bulan berikutnya setelah Pembayaran, anda bisa menuju pada http://localhost:8000/bayarKredit dengan cara memasukkan data transaction_number, user_id yang melakukan Pembayaran kredit dan tanggal_pembayaran. no transaksi dimasukkan pada parameter 'transaction_number', id user dimasukkan pada parameter 'user_id', dan tanggal_pembayaran dimasukkan pada parameter 'tanggal_pembayaran' (tanggal pembayaran didasarkan pada tanggal User melakukan Pembayaran kredit tersebut, diinputkan secara manual).
+
+# Jika anda tidak mengingat no transaksi dari Pembayaran yang dilakukan, anda bisa menuju ke http://localhost:8000/getAllPembayaran, klik 'Send Request', nanti akan muncul response list Pembayaran yang telah dilakukan. Cari transaksi anda sebelumnya dan copy no transaksinya. 
+
+# Untuk mengetahui id user, anda bisa menuju ke http://localhost:8000/getUser dan memasukkan email User yang melakukan Pembayaran kredit pada parameter 'email' yang ada pada URL, lalu klik 'Send Request' nanti akan muncul response mengenai informasi data user. Lalu anda tinggal meng-copy id usernya.
+
+Setelah memasukkan data, klik 'Send Request', maka akan muncul response Pembayaran berhasil, Sisa saldo rekening yang dipilih User pada Pembayaran pertama, dan sisa jangka waktu kredit. 
+
+Note: Pembayaran kredit akan lunas sesuai dengan tenggat jangka waktu yang telah ditentukan saat melakukan Pembayaran pertama, dan User akan melakukan Pembayaran kredit dengan rekening bank yang sama saat User melakukan Pembayaran pertama.
+
+7. Alur API selesai. Jika ada kesulitan dan pertanyaan bisa langsung disampaikan kepada saya, sekian dan terima kasih.
