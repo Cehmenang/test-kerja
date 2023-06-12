@@ -87,7 +87,7 @@ Setelah memasukkan data, klik 'Send Request' untuk membuat data Pembayaran. Jika
 
 # Untuk mengetahui id user, anda bisa menuju ke http://localhost:8000/getUser dan memasukkan email User yang melakukan Pembayaran kredit pada parameter 'email' yang ada pada URL, lalu klik 'Send Request' nanti akan muncul response mengenai informasi data user. Lalu anda tinggal meng-copy id usernya.
 
-Setelah memasukkan data, klik 'Send Request', maka akan muncul response Pembayaran berhasil, Sisa saldo rekening yang dipilih User pada Pembayaran pertama, dan sisa jangka waktu kredit. 
+Setelah memasukkan data, klik 'Send Request', maka akan muncul response Pembayaran berhasil, Sisa saldo rekening yang dipilih User pada Pembayaran pertama, sisa jangka waktu kredit, dan Perhitungan Marketing yang memegang Penjualan tersebut pada bulan Pembayaran kredit 
 
 Note: Pembayaran kredit akan lunas sesuai dengan tenggat jangka waktu yang telah ditentukan saat melakukan Pembayaran pertama, dan User akan melakukan Pembayaran kredit dengan rekening bank yang sama saat User melakukan Pembayaran pertama.
 
